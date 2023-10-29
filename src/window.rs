@@ -14,13 +14,13 @@ use windows::{
       LoadCursorW, PostQuitMessage, RegisterClassW, SetWindowLongPtrW, ShowWindow,
       CREATESTRUCTW, CW_USEDEFAULT, GWLP_USERDATA, IDC_ARROW, SW_SHOW, WM_DESTROY,
       WM_LBUTTONDOWN, WM_MOUSEMOVE, WM_CREATE, WM_NCCREATE, WM_RBUTTONDOWN, WM_SIZE, WM_SIZING,
-      WNDCLASSW, WS_EX_NOREDIRECTIONBITMAP, WS_OVERLAPPEDWINDOW, WM_PAINT, WS_EX_OVERLAPPEDWINDOW,
-    }, Graphics::Gdi::{PAINTSTRUCT, HDC, BeginPaint, FillRect, HBRUSH, EndPaint, COLOR_WINDOW, SYS_COLOR_INDEX, CreatePen, PS_SOLID, MoveToEx, SelectObject, LineTo, HGDIOBJ, DeleteObject, LOGBRUSH, BS_SOLID, ExtCreatePen, PS_COSMETIC, UpdateWindow, RedrawWindow, RDW_FRAME},
+      WNDCLASSW, WS_EX_NOREDIRECTIONBITMAP, WS_OVERLAPPEDWINDOW, WM_PAINT, WS_EX_OVERLAPPEDWINDOW, WM_KEYDOWN,
+    }, Graphics::Gdi::{PAINTSTRUCT, HDC, BeginPaint, FillRect, HBRUSH, EndPaint, COLOR_WINDOW, SYS_COLOR_INDEX, CreatePen, PS_SOLID, MoveToEx, SelectObject, LineTo, HGDIOBJ, DeleteObject, LOGBRUSH, BS_SOLID, ExtCreatePen, PS_COSMETIC, UpdateWindow, RedrawWindow, RDW_FRAME, InvalidateRect},
   },
   UI::Composition::{Compositor, Desktop::DesktopWindowTarget},
 };
 
-use crate::{get_scene, draw_line};
+use crate::{ draw_line, SCENE};
 
 static REGISTER_WINDOW_CLASS: Once = Once::new();
 const WINDOW_CLASS_NAME: PCWSTR = w!("minesweeper-rs.Window");
@@ -102,7 +102,10 @@ impl Window {
   }
 
   pub fn paint_window(&self) {
-    unsafe{UpdateWindow(self.handle)};
+    unsafe{
+      InvalidateRect(self.handle, None, false);
+      UpdateWindow(self.handle);
+    };
   }
 
   pub fn redraw_window(&self) {
@@ -142,15 +145,16 @@ impl Window {
         let mut ps: PAINTSTRUCT = PAINTSTRUCT::default();
         let hdc: HDC = unsafe {BeginPaint(self.handle, &mut ps as *mut PAINTSTRUCT)};
         let hbrush = HBRUSH::default();
-        let scene = get_scene();
         unsafe {FillRect(hdc, &ps.rcPaint,hbrush)};
-        scene.render(hdc);
-        println!("painted");
+        unsafe { SCENE.render(hdc) };
         unsafe {EndPaint(self.handle, &ps)};
       }
       WM_LBUTTONDOWN => {
       }
       WM_RBUTTONDOWN => {
+      }
+      WM_KEYDOWN => {
+        
       }
       _ => {}
     }
