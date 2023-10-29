@@ -99,8 +99,8 @@ fn main(){
       ]
     };
 
-    let v_up:Vec3 = Vec3{x:0.0, y:0.0, z:0.0, w:1.0};
-    let v_look_direction:Vec3 = Vec3{x:0.0, y:1.0, z:0.0, w:1.0};
+    let v_look_direction:Vec3 = Vec3{x:0.0, y:0.0, z:1.0, w:1.0};
+    let v_up:Vec3 = Vec3{x:0.0, y:1.0, z:0.0, w:1.0};
     let v_target:Vec3 = vec3_add(&v_up, &v_look_direction);
     let mat_camera:Mat4x4 = matrix_point_at(&v_camera, &v_target, &v_up);
     let mat_view:Mat4x4 = matrix_quick_inverse(&mat_camera);
@@ -153,13 +153,21 @@ fn main(){
           let light_direction = Vec3{x:-1.0,y:-1.0, z:0.0, w:1.0};
           let dp = vec3_dot_product(&light_direction, &normal);
           tri_translated.col = lighten_darken_color(tri_translated.col, dp);
-  
+          
+          let tri_viewed:Triangle = Triangle { 
+            p: [
+              multiply_matrix_vector(&tri_translated.p[0],&mat_view),
+              multiply_matrix_vector(&tri_translated.p[1],&mat_view),
+              multiply_matrix_vector(&tri_translated.p[2],&mat_view)
+            ], 
+            col: tri_translated.col 
+          };
   
           let mut tri_projected: Triangle = Triangle{
             p:[
-              multiply_matrix_vector(&tri_translated.p[0], &mat_proj), 
-              multiply_matrix_vector(&tri_translated.p[1], &mat_proj), 
-              multiply_matrix_vector(&tri_translated.p[2], &mat_proj)
+              multiply_matrix_vector(&tri_viewed.p[0], &mat_proj), 
+              multiply_matrix_vector(&tri_viewed.p[1], &mat_proj), 
+              multiply_matrix_vector(&tri_viewed.p[2], &mat_proj)
             ],
             col:tri_translated.col
           };
@@ -200,7 +208,8 @@ fn main(){
 //#[derive(Debug)]
 pub struct Scene{
   tris: Vec<Triangle>,
-  objs: Vec<Mesh>
+  objs: Vec<Mesh>,
+  camera: Vec3,
 }
 
 impl Scene {
