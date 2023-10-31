@@ -1,5 +1,6 @@
 use crate::*;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Mat4x4 {pub m:[[f32; 4]; 4]}
 
 pub fn rotate_x(rotate_amount:f32, point:&Vec3) -> Vec3{
@@ -67,4 +68,22 @@ pub fn matrix_quick_inverse(m:&Mat4x4) -> Mat4x4 {
       1.0
     ]
   ]}
+}
+
+pub fn matrix_make_rotation_y(amount:f32) -> Mat4x4 {
+  Mat4x4 { m: [
+    [f32::cos(amount),0.0,f32::sin(amount),0.0],
+    [0.0,1.0,0.0,0.0],
+    [-f32::sin(amount),0.0,f32::cos(amount),0.0],
+    [0.0,0.0,0.0,1.0]
+  ]}
+}
+
+pub fn matrix_make_rotation_x(amount:f32) -> Mat4x4 {
+  Mat4x4 { m: [
+    [1.0,0.0,0.0,0.0],
+    [0.0,f32::cos(amount),f32::sin(amount),0.0],
+    [0.0,-f32::sin(amount),f32::cos(amount),0.0],
+    [0.0,0.0,0.0,1.]
+    ]}
 }

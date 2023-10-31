@@ -7,7 +7,7 @@ pub fn draw_line(hdc:HDC, start_x:f32, start_y:f32, end_x:f32, end_y:f32){
   let rounded_start_y:i32 = unsafe{start_y.to_int_unchecked::<i32>()};
   let rounded_end_x:i32 = unsafe{end_x.to_int_unchecked::<i32>()};
   let rounded_end_y:i32 = unsafe{end_y.to_int_unchecked::<i32>()};
-  let pen = unsafe{CreatePen(PS_SOLID, 2, COLORREF(0x000000ff))};
+  let pen = unsafe{CreatePen(PS_SOLID, 2, COLORREF(0x00000000))};
   let h_pen_old: HGDIOBJ = unsafe{SelectObject(hdc, pen)};
   unsafe{MoveToEx(hdc, rounded_start_x, rounded_start_y, None)};
   unsafe{LineTo(hdc, rounded_end_x, rounded_end_y)};
